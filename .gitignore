@@ -1,0 +1,36 @@
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+*.so
+.venv/
+.env
+build/
+dist/
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+
+# LanceDB / Data
+*.lance/
+knowledge_base/
+output/
+data/
+.fastembed_cache/
+protoc/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
