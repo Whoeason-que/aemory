@@ -1,7 +1,7 @@
 [package]
 name = "aemory"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [lib]
 name = "aemory"
@@ -9,24 +9,24 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 # Core dependencies
-lance = "1.0.4"
-arrow = "56.2.0"
-arrow-array = "56.2.0"
-arrow-schema = "56.2.0"
-fastembed = "5.8.1"
+lance = "2.0.1"
+# arrow = "56.2.0"
+arrow-array = "58.0.0"
+arrow-schema = "58.0.0"
+fastembed = "5.11.0"
 
 # CLI and Async
 clap = { version = "4.5", features = ["derive"] }
-tokio = { version = "1.39", features = ["full"] }
+tokio = { version = "1.49", features = ["full"] }
 
 # Utilities
 gray_matter = "0.3.2"
-uuid = { version = "1.20.0", features = ["v4"] }
+uuid = { version = "1.21.0", features = ["v4"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 walkdir = "2.5"
 anyhow = "1.0"
-indicatif = "0.18.3"
-chrono = "0.4.43"
-pyo3 = { version = "0.22", features = ["extension-module"] }
-futures = "0.3.31"
+indicatif = "0.18.4"
+chrono = "0.4.44"
+pyo3 = { version = "0.28.2", features = ["extension-module"] }
+futures = "0.3.32"

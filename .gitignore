@@ -1,7 +1,6 @@
 # Rust
 /target/
 **/*.rs.bk
-Cargo.lock
 
 # Python
 __pycache__/
@@ -24,13 +23,14 @@ output/
 data/
 .fastembed_cache/
 protoc/
-
+__protoc__
 # Editor / IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-
+.qoder
 # OS
 .DS_Store
 Thumbs.db
+dev
