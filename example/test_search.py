@@ -22,13 +22,19 @@ if __name__ == "__main__":
     output_path = os.path.join(base_dir, "test_output.lance")
 
     # Step 1: Compile markdown files into Lance dataset
-    if not os.path.exists(output_path):
-        print("Building dataset from markdown files...")
-        print(f"  Input:  {kb_path}")
-        print(f"  Output: {output_path}")
-        print(f"  Model:  {MODEL_NAME}")
-        aemory.build(kb_path, output_path, MODEL_NAME)
-        print("✓ Dataset built successfully\n")
+    # Always rebuild to ensure model consistency
+    if os.path.exists(output_path):
+        import shutil
+
+        print("⚠️  Removing existing dataset to ensure model consistency...")
+        shutil.rmtree(output_path)
+
+    print("Building dataset from markdown files...")
+    print(f"  Input:  {kb_path}")
+    print(f"  Output: {output_path}")
+    print(f"  Model:  {MODEL_NAME}")
+    aemory.build(kb_path, output_path, MODEL_NAME)
+    print("✓ Dataset built successfully\n")
 
     # Step 2: Search for relevant chunks
     print(f"--- Searching in {output_path} ---")

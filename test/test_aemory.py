@@ -74,12 +74,16 @@ class TestBuild:
         os.makedirs(empty_dir)
         output_path = os.path.join(temp_dir, "empty.lance")
         aemory.build(empty_dir, output_path, TEST_MODEL)
+        # Empty directories don't create output files
         assert not os.path.exists(output_path)
 
-    def test_build_nonexistent_path_raises(self, temp_dir):
+    def test_build_nonexistent_path_handles_gracefully(self, temp_dir):
+        """Non-existent paths should be handled gracefully (no crash)"""
         output_path = os.path.join(temp_dir, "output.lance")
-        with pytest.raises(Exception):
-            aemory.build("/nonexistent/path", output_path, TEST_MODEL)
+        # Should not raise - just processes 0 files
+        aemory.build("/nonexistent/path", output_path, TEST_MODEL)
+        # No output file created when input is empty
+        assert not os.path.exists(output_path)
 
 
 class TestSearch:

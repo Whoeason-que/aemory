@@ -17,16 +17,19 @@
 ## Installation
 
 ### From PyPI (Recommended)
+
 ```bash
 pip install aemory
 ```
 
 Pre-built wheels are available for:
+
 - **Linux**: x86_64, x86, aarch64, armv7 (glibc and musl)
 - **Windows**: x64, ARM64
 - **macOS**: Intel (x86_64) and Apple Silicon (aarch64)
 
 ### Development Build
+
 ```bash
 # Install maturin for building the python extension
 pip install maturin
@@ -40,6 +43,7 @@ maturin develop --release
 ## Quick Start
 
 ### 1. Build a Dataset
+
 Compile your markdown files into a vector index.
 
 ```python
@@ -54,6 +58,7 @@ aemory.build(
 ```
 
 ### 2. Search
+
 Retrieve relevant context for your LLM.
 
 ```python
@@ -69,11 +74,13 @@ for r in results:
 ```
 
 ### 3. Full Example
+
 See [example/test_search.py](example/test_search.py) for a complete working example.
 
 ## Supported Models
 
 Aemory uses BERT-based models compatible with Candle. Recommended models:
+
 - `sentence-transformers/all-MiniLM-L6-v2` (lightweight, 80MB)
 - `BAAI/bge-small-en-v1.5` (English, 130MB)
 - `BAAI/bge-base-en-v1.5` (English, better quality, 440MB)
@@ -83,12 +90,14 @@ Models are automatically downloaded from Hugging Face Hub on first use.
 ## Architecture
 
 Aemory operates as a compiler pipeline:
+
 1. **Loader**: Traverses markdown files and parses frontmatter.
 2. **Chunker**: Splits content hierarchically based on headers.
 3. **Embedder**: Generates vector embeddings using Candle (pure Rust BERT implementation).
 4. **Compiler**: Writes structured data (Content + Vectors + Metadata) to Lance format.
 
 ### Technical Stack
+
 - **Embedding**: Candle with BERT models from Hugging Face Hub
 - **Vector Store**: Lance (Apache Arrow columnar format)
 - **TLS**: rustls (pure Rust, no OpenSSL dependency)

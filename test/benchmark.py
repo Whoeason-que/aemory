@@ -11,7 +11,7 @@ import aemory
 BENCH_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def large_md_dataset():
     temp_dir = tempfile.mkdtemp()
     md_path = Path(temp_dir) / "large_docs"
@@ -41,12 +41,14 @@ category: benchmark
     shutil.rmtree(temp_dir, ignore_errors=True)
 
 
-@pytest.fixture
-def built_large_dataset(benchmark, large_md_dataset):
+@pytest.fixture(scope="session")
+def built_large_dataset(large_md_dataset):
+    """Build dataset once for all search benchmarks (not benchmarked itself)"""
     output_path = os.path.join(tempfile.gettempdir(), "bench_large.lance")
     if os.path.exists(output_path):
         shutil.rmtree(output_path)
-    benchmark(lambda: aemory.build(large_md_dataset, output_path, BENCH_MODEL))
+    # Build without benchmarking - we only benchmark the search operations
+    aemory.build(large_md_dataset, output_path, BENCH_MODEL)
     yield output_path
     if os.path.exists(output_path):
         shutil.rmtree(output_path)

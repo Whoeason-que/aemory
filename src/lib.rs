@@ -6,8 +6,7 @@ pub mod schema;
 
 use anyhow::Result;
 use indicatif::{ProgressBar, ProgressStyle};
-use pyo3::prelude::*;
-use std::collections::HashMap;
+use pyo3::{prelude::*, types::PyDict, Py, types::PyAny};
 use std::path::PathBuf;
 
 /// Build the dataset (Python Wrapper)
@@ -82,11 +81,12 @@ pub async fn build_async(input: String, output: String, model: String) -> Result
 /// Search the dataset (Python Wrapper)
 #[pyfunction]
 fn search(
+    py: Python,
     uri: String,
     query: String,
     limit: usize,
     model: String,
-) -> PyResult<Vec<HashMap<String, String>>> {
+) -> PyResult<Vec<Py<PyAny>>> {
     let rt = tokio::runtime::Runtime::new().unwrap();
     let results = rt.block_on(async {
         let mut retriever = retriever::Retriever::new(&uri, &model)
@@ -101,12 +101,12 @@ fn search(
     let py_results = results
         .into_iter()
         .map(|r| {
-            let mut map = HashMap::new();
-            map.insert("content".to_string(), r.content);
-            map.insert("source_path".to_string(), r.source_path);
-            map.insert("metadata".to_string(), r.metadata);
-            map.insert("score".to_string(), r.score.to_string());
-            map
+            let dict = PyDict::new(py);
+            dict.set_item("content", r.content).unwrap();
+            dict.set_item("source_path", r.source_path).unwrap();
+            dict.set_item("metadata", r.metadata).unwrap();
+            dict.set_item("score", r.score).unwrap();
+            dict.unbind().into_any()
         })
         .collect();
 
