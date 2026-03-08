@@ -12,7 +12,7 @@
 - 🐍 **Python Bindings**: Native integration via PyO3. Use it just like any Python library.
 - 🔋 **Zero-Copy**: Leverages Arrow format for efficient data handling.
 - 🦀 **Pure Rust**: Uses Candle for embeddings and rustls for TLS - no system dependencies required.
-- 🌍 **Universal Platform Support**: Pre-built wheels for 8 platforms (Linux glibc/musl, Windows x64, macOS Intel/Apple Silicon).
+- 🌍 **Universal Platform Support**: Pre-built wheels for 7 platforms (Linux glibc/musl, Windows x64, macOS Intel/Apple Silicon).
 
 ## Installation
 
@@ -24,11 +24,12 @@ pip install aemory
 
 Pre-built wheels are available for:
 
-- **Linux**: x86_64, x86, aarch64 (glibc and musl)
+- **Linux**: x86_64, aarch64 (glibc and musl)
 - **Windows**: x64 only
 - **macOS**: Intel (x86_64) and Apple Silicon (aarch64)
 
-> **Note**: ARMv7 (Linux) and ARM64 (Windows) are temporarily disabled due to:
+> **Note**: x86/ARMv7 (Linux) and ARM64 (Windows) are temporarily disabled due to:
+> - x86: Upstream compilation issue in lance-core 2.0.1 on i686
 > - ARMv7: Upstream compilation issue in lance-core 2.0.1
 > - Windows ARM64: GitHub Actions Python installation instability
 
@@ -43,6 +44,22 @@ maturin develop --release
 ```
 
 **Note**: Building from source requires the Rust toolchain. The protoc (Protocol Buffers compiler) is automatically downloaded by the build script.
+
+### Release Optimization Profile
+
+This project uses a more aggressive Cargo release profile to maximize runtime performance and reduce wheel size:
+
+```toml
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+debug = false
+incremental = false
+```
+
+These flags trade longer compile time for faster runtime and smaller release artifacts.
 
 ## Quick Start
 
