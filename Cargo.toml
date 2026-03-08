@@ -10,9 +10,9 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 # Core dependencies
 lance = "2.0.1"
-# arrow = "56.2.0"
-arrow-array = "58.0.0"
-arrow-schema = "58.0.0"
+# arrow = "57.3.0"
+arrow-array = "57.3.0"
+arrow-schema = "57.3.0"
 fastembed = "5.11.0"
 
 # CLI and Async
