@@ -36,9 +36,11 @@ chrono = "0.4.44"
 pyo3 = { version = "0.28.2", features = ["extension-module"] }
 futures = "0.3.32"
 openssl = { version = "0.10.75", optional = true }
+openssl-sys = { version = "0.9.111", optional = true, features = ["vendored"] }
 [features]
 vendored-ssl = [
     "dep:openssl",
+    "dep:openssl-sys",
     "openssl/vendored",
 ]
 
