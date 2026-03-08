@@ -25,8 +25,10 @@ jobs:
         platform:
           - runner: ubuntu-22.04
             target: x86_64
-          - runner: ubuntu-22.04
-            target: x86
+          # x86 temporarily disabled due to lance-core 2.0.1 i686 compilation bug
+          # Tracking: https://github.com/lancedb/lance/issues
+          # - runner: ubuntu-22.04
+          #   target: x86
           - runner: ubuntu-22.04
             target: aarch64
           # armv7 temporarily disabled due to lance-core 2.0.1 upstream compilation bug
