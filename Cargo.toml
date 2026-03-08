@@ -35,9 +35,3 @@ indicatif = "0.18.4"
 chrono = "0.4.44"
 pyo3 = { version = "0.28.2", features = ["extension-module"] }
 futures = "0.3.32"
-
-# Optional: for vendored OpenSSL builds
-openssl = { version = "0.10", optional = true }
-
-[features]
-vendored-ssl = ["openssl/vendored"]
