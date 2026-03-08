@@ -36,7 +36,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist --find-interpreter --features vendored-ssl
+          args: --release --out dist --find-interpreter
           sccache: false
           manylinux: manylinux_2_28
           before-script-linux: |
@@ -71,7 +71,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist --find-interpreter --features vendored-ssl
+          args: --release --out dist --find-interpreter
           sccache: false
           manylinux: musllinux_1_2
           before-script-linux: |
