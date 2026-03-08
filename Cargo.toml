@@ -35,3 +35,10 @@ indicatif = "0.18.4"
 chrono = "0.4.44"
 pyo3 = { version = "0.28.2", features = ["extension-module"] }
 futures = "0.3.32"
+openssl = { version = "0.10.75", optional = true }
+[features]
+vendored-ssl = [
+    "dep:openssl",
+    "openssl/vendored",
+]
+
