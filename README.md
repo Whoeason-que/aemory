@@ -12,7 +12,7 @@
 - 🐍 **Python Bindings**: Native integration via PyO3. Use it just like any Python library.
 - 🔋 **Zero-Copy**: Leverages Arrow format for efficient data handling.
 - 🦀 **Pure Rust**: Uses Candle for embeddings and rustls for TLS - no system dependencies required.
-- 🌍 **Universal Platform Support**: Pre-built wheels for 13 platforms (Linux glibc/musl, Windows x64/ARM64, macOS Intel/Apple Silicon).
+- 🌍 **Universal Platform Support**: Pre-built wheels for 9 platforms (Linux glibc/musl, Windows x64/ARM64, macOS Intel/Apple Silicon).
 
 ## Installation
 
@@ -24,9 +24,11 @@ pip install aemory
 
 Pre-built wheels are available for:
 
-- **Linux**: x86_64, x86, aarch64, armv7 (glibc and musl)
+- **Linux**: x86_64, x86, aarch64 (glibc and musl)
 - **Windows**: x64, ARM64
 - **macOS**: Intel (x86_64) and Apple Silicon (aarch64)
+
+> **Note**: ARMv7 support is temporarily disabled due to an upstream compilation issue in lance-core 2.0.1.
 
 ### Development Build
 
