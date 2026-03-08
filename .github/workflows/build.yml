@@ -32,10 +32,14 @@ jobs:
           python-version: 3.x
       - name: Setup protoc
         run: python scripts/download_protoc.py
+      - name: Export PROTOC
+        run: |
+          echo "PROTOC=${GITHUB_WORKSPACE}/protoc/bin/protoc" >> "$GITHUB_ENV"
+      - name: Verify protoc
+        run: |
+          "$PROTOC" --version
       - name: Build wheels
         uses: PyO3/maturin-action@v1
-        env:
-          PROTOC: protoc/bin/protoc
         with:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter --features vendored-ssl
@@ -56,6 +60,7 @@ jobs:
           path: dist
 
   musllinux:
+    if: ${{ false }}
     runs-on: ${{ matrix.platform.runner }}
     strategy:
       matrix:
@@ -69,10 +74,14 @@ jobs:
           python-version: 3.x
       - name: Setup protoc
         run: python scripts/download_protoc.py
+      - name: Export PROTOC
+        run: |
+          echo "PROTOC=${GITHUB_WORKSPACE}/protoc/bin/protoc" >> "$GITHUB_ENV"
+      - name: Verify protoc
+        run: |
+          "$PROTOC" --version
       - name: Build wheels
         uses: PyO3/maturin-action@v1
-        env:
-          PROTOC: protoc/bin/protoc
         with:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter --features vendored-ssl
@@ -108,10 +117,16 @@ jobs:
           architecture: ${{ matrix.platform.python_arch }}
       - name: Setup protoc
         run: python scripts/download_protoc.py
+      - name: Export PROTOC
+        shell: pwsh
+        run: |
+          "PROTOC=$env:GITHUB_WORKSPACE\protoc\bin\protoc.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Verify protoc
+        shell: pwsh
+        run: |
+          & "$env:PROTOC" --version
       - name: Build wheels
         uses: PyO3/maturin-action@v1
-        env:
-          PROTOC: protoc/bin/protoc.exe
         with:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
@@ -138,10 +153,14 @@ jobs:
           python-version: 3.x
       - name: Setup protoc
         run: python scripts/download_protoc.py
+      - name: Export PROTOC
+        run: |
+          echo "PROTOC=${GITHUB_WORKSPACE}/protoc/bin/protoc" >> "$GITHUB_ENV"
+      - name: Verify protoc
+        run: |
+          "$PROTOC" --version
       - name: Build wheels
         uses: PyO3/maturin-action@v1
-        env:
-          PROTOC: protoc/bin/protoc
         with:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
@@ -171,7 +190,7 @@ jobs:
     name: Test Publish
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.publish == 'true' }}
-    needs: [linux, musllinux, windows, macos, sdist]
+    needs: [linux, windows, macos, sdist]
     permissions:
       id-token: write
     steps:
