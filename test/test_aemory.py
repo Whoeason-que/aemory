@@ -6,6 +6,9 @@ from pathlib import Path
 
 import aemory
 
+# Use lightweight model for testing
+TEST_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+
 
 @pytest.fixture
 def temp_dir():
@@ -56,39 +59,37 @@ Additional content for semantic search testing.
 @pytest.fixture
 def built_dataset(sample_md_files, temp_dir):
     output_path = os.path.join(temp_dir, "test.lance")
-    aemory.build(sample_md_files, output_path, "BAAI/bge-small-en-v1.5")
+    aemory.build(sample_md_files, output_path, TEST_MODEL)
     return output_path
 
 
 class TestBuild:
     def test_build_creates_dataset(self, sample_md_files, temp_dir):
         output_path = os.path.join(temp_dir, "output.lance")
-        aemory.build(sample_md_files, output_path, "BAAI/bge-small-en-v1.5")
+        aemory.build(sample_md_files, output_path, TEST_MODEL)
         assert os.path.exists(output_path)
 
     def test_build_empty_directory(self, temp_dir):
         empty_dir = os.path.join(temp_dir, "empty")
         os.makedirs(empty_dir)
         output_path = os.path.join(temp_dir, "empty.lance")
-        aemory.build(empty_dir, output_path, "BAAI/bge-small-en-v1.5")
+        aemory.build(empty_dir, output_path, TEST_MODEL)
         assert not os.path.exists(output_path)
 
     def test_build_nonexistent_path_raises(self, temp_dir):
         output_path = os.path.join(temp_dir, "output.lance")
         with pytest.raises(Exception):
-            aemory.build("/nonexistent/path", output_path, "BAAI/bge-small-en-v1.5")
+            aemory.build("/nonexistent/path", output_path, TEST_MODEL)
 
 
 class TestSearch:
     def test_search_returns_results(self, built_dataset):
-        results = aemory.search(
-            built_dataset, "introduction", 5, "BAAI/bge-small-en-v1.5"
-        )
+        results = aemory.search(built_dataset, "introduction", 5, TEST_MODEL)
         assert isinstance(results, list)
         assert len(results) > 0
 
     def test_search_result_structure(self, built_dataset):
-        results = aemory.search(built_dataset, "content", 1, "BAAI/bge-small-en-v1.5")
+        results = aemory.search(built_dataset, "content", 1, TEST_MODEL)
         assert len(results) > 0
         result = results[0]
         assert "content" in result
@@ -97,11 +98,11 @@ class TestSearch:
         assert "score" in result
 
     def test_search_limit(self, built_dataset):
-        results = aemory.search(built_dataset, "document", 3, "BAAI/bge-small-en-v1.5")
+        results = aemory.search(built_dataset, "document", 3, TEST_MODEL)
         assert len(results) <= 3
 
     def test_search_empty_query(self, built_dataset):
-        results = aemory.search(built_dataset, "", 5, "BAAI/bge-small-en-v1.5")
+        results = aemory.search(built_dataset, "", 5, TEST_MODEL)
         assert isinstance(results, list)
 
     def test_search_nonexistent_dataset_raises(self, temp_dir):
@@ -110,7 +111,7 @@ class TestSearch:
                 os.path.join(temp_dir, "nonexistent.lance"),
                 "query",
                 5,
-                "BAAI/bge-small-en-v1.5",
+                TEST_MODEL,
             )
 
 
@@ -118,9 +119,9 @@ class TestIntegration:
     def test_build_and_search_workflow(self, sample_md_files, temp_dir):
         output_path = os.path.join(temp_dir, "integration.lance")
 
-        aemory.build(sample_md_files, output_path, "BAAI/bge-small-en-v1.5")
+        aemory.build(sample_md_files, output_path, TEST_MODEL)
 
-        results = aemory.search(output_path, "section", 5, "BAAI/bge-small-en-v1.5")
+        results = aemory.search(output_path, "section", 5, TEST_MODEL)
 
         assert len(results) > 0
         for r in results:
@@ -131,5 +132,5 @@ class TestIntegration:
         queries = ["introduction", "document", "section", "content"]
 
         for query in queries:
-            results = aemory.search(built_dataset, query, 3, "BAAI/bge-small-en-v1.5")
+            results = aemory.search(built_dataset, query, 3, TEST_MODEL)
             assert isinstance(results, list)

@@ -11,12 +11,20 @@
 - 🧠 **Smart Chunking**: Recursively chunks Markdown by headers to preserve semantic context.
 - 🐍 **Python Bindings**: Native integration via PyO3. Use it just like any Python library.
 - 🔋 **Zero-Copy**: Leverages Arrow format for efficient data handling.
+- 🦀 **Pure Rust**: Uses Candle for embeddings and rustls for TLS - no system dependencies required.
+- 🌍 **Universal Platform Support**: Pre-built wheels for 13 platforms (Linux glibc/musl, Windows x64/ARM64, macOS Intel/Apple Silicon).
 
 ## Installation
 
-### Prerequisites
-- Rust Toolchain (stable)
-- Python 3.8+
+### From PyPI (Recommended)
+```bash
+pip install aemory
+```
+
+Pre-built wheels are available for:
+- **Linux**: x86_64, x86, aarch64, armv7 (glibc and musl)
+- **Windows**: x64, ARM64
+- **macOS**: Intel (x86_64) and Apple Silicon (aarch64)
 
 ### Development Build
 ```bash
@@ -26,6 +34,8 @@ pip install maturin
 # Build and install in current environment
 maturin develop --release
 ```
+
+**Note**: Building from source requires the Rust toolchain. The protoc (Protocol Buffers compiler) is automatically downloaded by the build script.
 
 ## Quick Start
 
@@ -39,7 +49,7 @@ import aemory
 aemory.build(
     input="./knowledge_base", 
     output="./data.lance", 
-    model="BAAI/bge-small-en-v1.5"
+    model="sentence-transformers/all-MiniLM-L6-v2"
 )
 ```
 
@@ -51,20 +61,38 @@ results = aemory.search(
     uri="./data.lance", 
     query="How does the compiler work?", 
     limit=3,
-    model="BAAI/bge-small-en-v1.5"
+    model="sentence-transformers/all-MiniLM-L6-v2"
 )
 
 for r in results:
     print(f"[{r['score']:.4f}] {r['content']}")
 ```
 
+### 3. Full Example
+See [example/test_search.py](example/test_search.py) for a complete working example.
+
+## Supported Models
+
+Aemory uses BERT-based models compatible with Candle. Recommended models:
+- `sentence-transformers/all-MiniLM-L6-v2` (lightweight, 80MB)
+- `BAAI/bge-small-en-v1.5` (English, 130MB)
+- `BAAI/bge-base-en-v1.5` (English, better quality, 440MB)
+
+Models are automatically downloaded from Hugging Face Hub on first use.
+
 ## Architecture
 
-Aemory operates as a compiler:
-1.  **Loader**: Traverses markdown files and parses frontmatter.
-2.  **Chunker**: Splits content hierarchically based on headers.
-3.  **Embedder**: Generates vector embeddings using FastEmbed (ONNX).
-4.  **Compiler**: Writes structured data (Content + Vectors + Metadata) to LanceDB.
+Aemory operates as a compiler pipeline:
+1. **Loader**: Traverses markdown files and parses frontmatter.
+2. **Chunker**: Splits content hierarchically based on headers.
+3. **Embedder**: Generates vector embeddings using Candle (pure Rust BERT implementation).
+4. **Compiler**: Writes structured data (Content + Vectors + Metadata) to Lance format.
+
+### Technical Stack
+- **Embedding**: Candle with BERT models from Hugging Face Hub
+- **Vector Store**: Lance (Apache Arrow columnar format)
+- **TLS**: rustls (pure Rust, no OpenSSL dependency)
+- **Python Bindings**: PyO3
 
 ## License
 

@@ -6,7 +6,7 @@ build-backend = "maturin"
 name = "aemory"
 dynamic = ["version"]
 requires-python = ">=3.8"
-description = "A high-performance semantic search library built with Rust and Python"
+description = "High-performance RAG data compiler: pure Rust semantic search with no system dependencies"
 readme = "README.md"
 authors = [{ name = "huyixuan", email = "13423195166@163.com" }]
 license = { text = "MIT" }
@@ -21,10 +21,13 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-keywords = ["semantic-search", "embeddings", "rag", "vector-database", "rust"]
+keywords = ["knowledge-base", "semantic-search", "embeddings", "rag", "vector-database", "rust", "bert", "candle"]
 
 [project.urls]
 Homepage = "https://github.com/whoeason-que/aemory"
@@ -33,7 +36,7 @@ Homepage = "https://github.com/whoeason-que/aemory"
 # Build requirements: protoc (protobuf compiler) is required when building from source
 # Users installing from PyPI get pre-built wheels and don't need protoc
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = ["pytest>=7.0", "ruff"]
 
 [tool.pytest.ini_options]
