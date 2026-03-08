@@ -118,9 +118,11 @@ jobs:
           - runner: windows-latest
             target: x64
             python_arch: x64
-          - runner: windows-latest
-            target: aarch64
-            python_arch: arm64
+          # ARM64 temporarily disabled due to GitHub Actions Python installation issues
+          # Tracking: Python 3.13 ARM64 setup fails on windows-latest
+          # - runner: windows-latest
+          #   target: aarch64
+          #   python_arch: arm64
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
