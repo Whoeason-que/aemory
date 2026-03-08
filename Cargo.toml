@@ -18,7 +18,13 @@ lance = "2.0.1"
 # arrow = "57.3.0"
 arrow-array = "57.3.0"
 arrow-schema = "57.3.0"
-fastembed = "5.12.0"
+
+# Embedding (Candle)
+candle-core = "0.8"
+candle-nn = "0.8"
+candle-transformers = "0.8"
+hf-hub = "0.3"
+tokenizers = "0.20"
 
 # CLI and Async
 clap = { version = "4.5", features = ["derive"] }

@@ -26,7 +26,11 @@ jobs:
           - runner: ubuntu-22.04
             target: x86_64
           - runner: ubuntu-22.04
+            target: x86
+          - runner: ubuntu-22.04
             target: aarch64
+          - runner: ubuntu-22.04
+            target: armv7
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -62,13 +66,14 @@ jobs:
           path: dist
 
   musllinux:
-    if: ${{ false }}
     runs-on: ${{ matrix.platform.runner }}
     strategy:
       matrix:
         platform:
           - runner: ubuntu-22.04
             target: x86_64
+          - runner: ubuntu-22.04
+            target: aarch64
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -111,6 +116,9 @@ jobs:
           - runner: windows-latest
             target: x64
             python_arch: x64
+          - runner: windows-latest
+            target: aarch64
+            python_arch: arm64
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -144,6 +152,8 @@ jobs:
     strategy:
       matrix:
         platform:
+          - runner: macos-15-intel
+            target: x86_64
           - runner: macos-latest
             target: aarch64
     steps:
@@ -190,7 +200,7 @@ jobs:
     name: Publish to PyPI
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.target == 'pypi' }}
-    needs: [linux, windows, macos, sdist]
+    needs: [linux, musllinux, windows, macos, sdist]
     steps:
       - uses: actions/download-artifact@v6
       - name: Generate artifact attestation
