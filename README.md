@@ -47,19 +47,24 @@ maturin develop --release
 
 ### Release Optimization Profile
 
-This project uses a more aggressive Cargo release profile to maximize runtime performance and reduce wheel size:
+This project uses a balanced Cargo release profile optimized for CI environments while maintaining good runtime performance:
 
 ```toml
 [profile.release]
 opt-level = 3
-lto = "fat"
-codegen-units = 1
+lto = "thin"
+codegen-units = 4
 strip = true
 debug = false
 incremental = false
 ```
 
-These flags trade longer compile time for faster runtime and smaller release artifacts.
+**Why this configuration:**
+- `opt-level = 3`: Maximum optimizations for speed
+- `lto = "thin"`: Cost-effective link-time optimization (vs. destructive `fat` LTO)
+- `codegen-units = 4`: Allows parallel code generation to fit CI memory constraints
+- `strip = true`: Remove debug symbols to reduce binary size
+- `incremental = false`: Disable incremental compilation in release builds
 
 ## Quick Start
 
