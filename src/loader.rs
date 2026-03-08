@@ -26,7 +26,7 @@ impl Loader {
             .into_iter()
             .filter_map(|e| e.ok())
         {
-            if entry.path().extension().map_or(false, |ext| ext == "md") {
+            if entry.path().extension().is_some_and(|ext| ext == "md") {
                 let path = entry.path();
                 let content = fs::read_to_string(path)
                     .with_context(|| format!("Failed to read file: {:?}", path))?;
