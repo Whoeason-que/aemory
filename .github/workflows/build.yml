@@ -202,18 +202,33 @@ jobs:
           name: wheels-sdist
           path: dist
 
+  # --- 核心修改：测试发布到 TestPyPI ---
   test-publish:
     name: Test Publish
     runs-on: ubuntu-latest
+    # 仅当手动触发且勾选了发布选项时运行
     if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.publish == 'true' }}
     needs: [linux, musllinux, windows, macos, sdist]
+
+    # 建议在 PyPI 设置中创建一个名为 testpypi 的环境
+    environment: testpypi
+
     permissions:
-      id-token: write
+      id-token: write # 获取 OIDC 令牌的关键
+      contents: read
+
     steps:
-      - uses: actions/download-artifact@v6
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist
+
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v5
+
       - name: Publish to TestPyPI
-        run: uv publish 'wheels-*/*' --index-url https://test.pypi.org/simple/
-        env:
-          UV_PUBLISH_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        # uv 会自动识别 TestPyPI 的 OIDC 流程
+        # 注意：使用 --publish-url 而不是 --index-url (后者是用来下载的)
+        run: uv publish --publish-url https://test.pypi.org/legacy/ dist/*

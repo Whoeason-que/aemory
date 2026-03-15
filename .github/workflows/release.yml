@@ -17,7 +17,7 @@ permissions:
   attestations: write
 
 jobs:
-  # 包含完整的构建逻辑以确保发布内容一致性
+  # --- 构建 Linux 轮子 ---
   linux:
     runs-on: ${{ matrix.platform.runner }}
     strategy:
@@ -25,16 +25,8 @@ jobs:
         platform:
           - runner: ubuntu-22.04
             target: x86_64
-          # x86 temporarily disabled due to lance-core 2.0.1 i686 compilation bug
-          # Tracking: https://github.com/lancedb/lance/issues
-          # - runner: ubuntu-22.04
-          #   target: x86
           - runner: ubuntu-22.04
             target: aarch64
-          # armv7 temporarily disabled due to lance-core 2.0.1 upstream compilation bug
-          # Tracking: https://github.com/lancedb/lance/issues
-          # - runner: ubuntu-22.04
-          #   target: armv7
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -45,9 +37,6 @@ jobs:
       - name: Export PROTOC
         run: |
           echo "PROTOC=${GITHUB_WORKSPACE}/protoc/bin/protoc" >> "$GITHUB_ENV"
-      - name: Verify protoc
-        run: |
-          "$PROTOC" --version
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -69,6 +58,7 @@ jobs:
           name: wheels-linux-${{ matrix.platform.target }}
           path: dist
 
+  # --- 构建 Musl Linux 轮子 ---
   musllinux:
     runs-on: ${{ matrix.platform.runner }}
     strategy:
@@ -88,9 +78,6 @@ jobs:
       - name: Export PROTOC
         run: |
           echo "PROTOC=${GITHUB_WORKSPACE}/protoc/bin/protoc" >> "$GITHUB_ENV"
-      - name: Verify protoc
-        run: |
-          "$PROTOC" --version
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -112,6 +99,7 @@ jobs:
           name: wheels-musllinux-${{ matrix.platform.target }}
           path: dist
 
+  # --- 构建 Windows 轮子 ---
   windows:
     runs-on: ${{ matrix.platform.runner }}
     strategy:
@@ -120,11 +108,6 @@ jobs:
           - runner: windows-latest
             target: x64
             python_arch: x64
-          # ARM64 temporarily disabled due to GitHub Actions Python installation issues
-          # Tracking: Python 3.13 ARM64 setup fails on windows-latest
-          # - runner: windows-latest
-          #   target: aarch64
-          #   python_arch: arm64
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -137,10 +120,6 @@ jobs:
         shell: pwsh
         run: |
           "PROTOC=$env:GITHUB_WORKSPACE\protoc\bin\protoc.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-      - name: Verify protoc
-        shell: pwsh
-        run: |
-          & "$env:PROTOC" --version
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -153,6 +132,7 @@ jobs:
           name: wheels-windows-${{ matrix.platform.target }}
           path: dist
 
+  # --- 构建 macOS 轮子 ---
   macos:
     runs-on: ${{ matrix.platform.runner }}
     strategy:
@@ -172,9 +152,6 @@ jobs:
       - name: Export PROTOC
         run: |
           echo "PROTOC=${GITHUB_WORKSPACE}/protoc/bin/protoc" >> "$GITHUB_ENV"
-      - name: Verify protoc
-        run: |
-          "$PROTOC" --version
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -187,6 +164,7 @@ jobs:
           name: wheels-macos-${{ matrix.platform.target }}
           path: dist
 
+  # --- 构建 源码包 (sdist) ---
   sdist:
     runs-on: ubuntu-latest
     steps:
@@ -202,21 +180,37 @@ jobs:
           name: wheels-sdist
           path: dist
 
+  # --- 核心修改：发布到 PyPI (使用 Trusted Publishing) ---
   publish-pypi:
     name: Publish to PyPI
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.target == 'pypi' }}
     needs: [linux, musllinux, windows, macos, sdist]
+
+    # 必须指定 environment，确保与 PyPI 后台配置一致
+    environment: pypi
+
+    permissions:
+      id-token: write # 允许获取 OIDC 令牌
+      attestations: write # 允许写入证明
+      contents: read # 读取内容
+
     steps:
-      - uses: actions/download-artifact@v6
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist
+
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v3
         with:
-          subject-path: "wheels-*/*"
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-      - name: Publish to PyPI
-        run: uv publish 'wheels-*/*'
-        env:
-          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+          subject-path: "dist/*"
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5 # 建议使用稳定版本
+
+      - name: Publish to PyPI
+        # 此时 uv 会自动寻找 OIDC 令牌，无需设置 UV_PUBLISH_TOKEN
+        run: uv publish dist/*
